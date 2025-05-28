@@ -1,45 +1,41 @@
 import pickle
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.applications.resnet50 import ResNet50
+from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.layers import GlobalAveragePooling2D
-from tensorflow.keras.applications.resnet50 import preprocess_input
 from numpy.linalg import norm
-from sklearn.neighbors import NearestNeighbors
+import faiss
 import cv2
 
-features_list = np.array(pickle.load(open('embeddings.pkl', 'rb')))
+# Load data
+features_list = pickle.load(open('embeddings.pkl', 'rb'))
 filenames = pickle.load(open('filenames.pkl', 'rb'))
+features_list = np.array(features_list).astype('float32')
 
-if features_list.ndim == 3:
-    features_list = features_list.reshape(features_list.shape[0], features_list.shape[2])
-print(features_list.shape)
-
-model = ResNet50(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
-model.trainable = False
-
+# Load model
 model = tf.keras.Sequential([
-    model,
+    ResNet50(weights='imagenet', include_top=False, input_shape=(224, 224, 3)),
     GlobalAveragePooling2D()
 ])
 
+# Feature extraction
 img = image.load_img('sample/1551.jpg', target_size=(224, 224))
 img_array = image.img_to_array(img)
-img_array = tf.expand_dims(img_array, axis=0)  
-img_array = np.array(img_array, dtype=np.float32)  
-preprocessed_img = preprocess_input(img_array)
-result = model.predict(preprocessed_img)
-normalized_result = result / norm(result)
-normalized_result = normalized_result.reshape(1, -1)
+img_array = tf.expand_dims(img_array, axis=0)
+img_array = np.array(img_array, dtype=np.float32)
+preprocessed = preprocess_input(img_array)
+result = model.predict(preprocessed, verbose=0)
+normalized = result / norm(result)
+normalized = normalized.astype('float32')
 
-neighbours = NearestNeighbors(n_neighbors=5, algorithm='brute', metric='euclidean')
-neighbours.fit(features_list)
-distances, indices = neighbours.kneighbors(normalized_result)
-print("Indices of nearest neighbors:", indices)
+# FAISS
+index = faiss.IndexFlatL2(features_list.shape[1])
+index.add(features_list)
+distances, indices = index.search(normalized, k=5)
 
-
-for file in indices[0]:
-    temp_img = cv2.imread(filenames[file])
-    cv2.imshow('output', cv2.resize(temp_img, (400, 400)))
+# Display
+for idx in indices[0]:
+    img = cv2.imread(filenames[idx])
+    cv2.imshow("Recommendation", cv2.resize(img, (400, 400)))
     cv2.waitKey(0)
