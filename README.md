@@ -1,4 +1,5 @@
 🧠 AI-Based Image Recommender System
+
 A powerful and intuitive content-based image recommender system that uses deep learning to suggest visually similar images based on their features. This project combines ResNet50, FAISS, and Streamlit to deliver real-time recommendations with a clean and user-friendly interface.
 
 🚀 Features
