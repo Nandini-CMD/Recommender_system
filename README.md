@@ -125,11 +125,3 @@ python test.py
 | 🧪 Scikit-learn | Brute-force Nearest Neighbors (Web UI) |
 | 🖼️ Streamlit  | Web interface for image upload and display |
 
-## 👩‍💻 Author
-
-**Nandini CMD**  
-GitHub: [@Nandini-CMD](https://github.com/Nandini-CMD)
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
