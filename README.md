@@ -1,4 +1,4 @@
-# 🖼️ Deep Learning-Based Image Recommender System
+# 🖼️Image Based Recommender System
 
 This project implements a **content-based image recommendation system** powered by deep learning. By leveraging **ResNet50** for visual feature extraction and **FAISS** for fast similarity search, this system suggests visually similar images based on the one uploaded by the user. The app is presented through an interactive **Streamlit** interface.
 
